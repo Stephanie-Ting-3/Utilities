@@ -16,14 +16,11 @@ def calculate(
         ):
 
     '''
-    results - (n,1) dimensional pandas dataframe containing binary predicted labels
-                labels must be numeric
-    true_labels - (n,1) dimensional pandas dataframe containing binary true labels
-                labels must be numeric
-                
+    results - 1d list-like containing binary predicted results
+    true_labels - 1d list-like containing true labels                
     what - list-like containing some combination of: 'sensitivity', 'specificity', 'accuracy'
     '''
-    labels=pd.concat([results, true_labels], axis=1)
+    labels=pd.DataFrame({"results":results, "true_labels":true_labels})
     
     #Match positive and negative patterns
     tp=((labels==[1,1]).sum(axis=1)==2).sum()
@@ -42,7 +39,7 @@ def calculate(
         elif i=='specificity':
             metrics.append(_spec(tn, fp))
         elif i=='accuracy':
-            metrics.append(_acc(tp, tn, len(true_labels))
+            metrics.append(_acc(tp, tn, len(true_labels)))
         else:
             print ("Error: what must be list-like containing \"sensitivity\", \"accuracy\" and/or \"specificity\"")
     return (metrics)
