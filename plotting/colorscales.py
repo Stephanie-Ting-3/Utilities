@@ -1,3 +1,14 @@
+'''
+Functions to handle mapping values to colors for seaborn clustermap
+
+Author: Stephanie Ting
+Stephanie.Ting.3@gmail.com
+7/24/2023
+
+Last edited:
+7/24/2023
+'''
+
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import get_cmap
 from matplotlib import cm
@@ -13,7 +24,7 @@ white = matplotlib.colors.to_rgba("white")
 def _mpl_normalize(s, method, cmap='vlag', **kwargs):
 
     '''
-    Internal function that returns mapper for mapping continuous variable to 
+    Internal function that maps continuous variable to 
     matplotlib colormap
 
     s - pandas Series to be mapped
@@ -34,6 +45,18 @@ def _mpl_normalize(s, method, cmap='vlag', **kwargs):
     return((s.map(lambda x: mapper.to_rgba(x)),))
 
 def _map_categorical_colors(s, values, dtype = 'categorical'):
+    '''
+    Internal function that maps a categorical or binary variable to 
+    sns color palettes.
+
+    s - pandas Series to be mapped
+    values - values in pandas Series
+    dtype - 'categorical' or 'binary' - determines what color 
+                            color palette will be used
+
+    Returns pandas Series object
+    '''
+    
     if dtype == 'categorical':
         colorscheme = sns.color_palette("bright")+sns.color_palette("pastel")
     elif dtype == 'binary':
