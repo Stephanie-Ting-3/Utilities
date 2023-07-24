@@ -24,10 +24,14 @@ def _mpl_normalize(s, method, cmap='vlag', **kwargs):
     Returns pandas Series object
     '''
 
-    # Create mapper using desired method and colormap
-    mapper = cm.ScalarMappable(method(**kwargs), cmap=get_cmap(cmap))
+    # Make sure dtype is numeric
+    s=s.astype(float)
 
-    return((s.apply(lambda x: mapper.to_rgba(x)),))
+    # Create mapper using desired method and colormap
+    norm = method(**kwargs)
+    mapper = cm.ScalarMappable(norm=norm, cmap=get_cmap(cmap))
+
+    return((s.map(lambda x: mapper.to_rgba(x)),))
 
 def _map_categorical_colors(s, values, dtype = 'categorical'):
     if dtype == 'categorical':
@@ -35,7 +39,7 @@ def _map_categorical_colors(s, values, dtype = 'categorical'):
     elif dtype == 'binary':
         colorscheme = [black, gray, white]
 
-    color_dict=dict(zip(values, color_scheme))
+    color_dict=dict(zip(values, colorscheme))
     
 
     #Return color key as well for referencing
@@ -76,7 +80,7 @@ def make_color_annotations(ds, datatype, normalization_method = "linear"):
         if dtype == "continuous":
             if normalization_method == "linear":
                 return_series.append(_mpl_normalize(group, matplotlib.colors.Normalize, vmin=-2.5, vmax=2.5))
-            elif normalizatio_method == "centered":
+            elif normalization_method == "centered":
                 return_series.append(_mpl_normalize(group, matplotlib.colors.CenteredNorm,
                                                     vcenter = np.median(group.values)
                                                     ))
