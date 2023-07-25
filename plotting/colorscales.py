@@ -6,7 +6,7 @@ Stephanie.Ting.3@gmail.com
 7/24/2023
 
 Last edited:
-7/24/2023
+7/25/2023
 '''
 
 import matplotlib.pyplot as plt
@@ -91,6 +91,7 @@ def make_color_annotations(ds, datatype, normalization_method = "linear"):
                 )
 
     return_series=[]
+    return_keys=[]
 
     for column, dtype in zip(ds.columns, datatype):
         group=ds.loc[:, column]
@@ -102,20 +103,25 @@ def make_color_annotations(ds, datatype, normalization_method = "linear"):
                
         if dtype == "continuous":
             if normalization_method == "linear":
-                return_series.append(_mpl_normalize(group, matplotlib.colors.Normalize, vmin=-2.5, vmax=2.5))
+                return_series.append(_mpl_normalize(group, matplotlib.colors.Normalize, vmin=-2.5, vmax=2.5)[0])
+                return_keys.append(None)
+
             elif normalization_method == "centered":
                 return_series.append(_mpl_normalize(group, matplotlib.colors.CenteredNorm,
                                                     vcenter = np.median(group.values)
-                                                    ))
+                                                    )[0])
+                return_keys.append(None)
             else:
                 raise AssertionError(
                         "method must be \"linear\" or \"centered\""
 
             )             
         else:
-            return_series.append(_map_categorical_colors(group, set(group.values), dtype))
+            cat_colors = _map_categorical_colors(group, set(group.values), dtype)
+            return_series.append(cat_colors[0])
+            return_keys.append(cat_colors[1])
     
-    return(return_series)
+    return((pd.DataFrame(return_series), return_keys))
         
         
 
