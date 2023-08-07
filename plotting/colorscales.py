@@ -6,7 +6,7 @@ Stephanie.Ting.3@gmail.com
 7/24/2023
 
 Last edited:
-7/25/2023
+8/4/2023
 '''
 
 import matplotlib.pyplot as plt
@@ -68,7 +68,7 @@ def _map_categorical_colors(s, values, dtype = 'categorical'):
     #Return color key as well for referencing
     return((s.map(color_dict), color_dict))
 
-def make_color_annotations(ds, datatype, normalization_method = "linear"):
+def make_color_annotations(ds, datatype, normalization_method = "linear", color_value_order = None):
 
     '''
     Makes a color annotation pandas Series or DataFrame mapping value to rgba value 
@@ -78,6 +78,13 @@ def make_color_annotations(ds, datatype, normalization_method = "linear"):
         columns and the features as rows
 
     datatype - iterable containing "continuous", "categorical", and/or "binary"
+    color_value_order - dict of lists of values for order in which values should be assigned to colors. 
+                        if None, values will be sorted ascending numerically or alphabetically
+                        
+                        for categorical colors the colors are in order of palette "bright"
+                        followed by "pastel"
+                        
+                        for binary colors the colors are in order of black, gray, white 
     '''
     
     if not len(datatype) == ds.shape[1]:
@@ -102,8 +109,11 @@ def make_color_annotations(ds, datatype, normalization_method = "linear"):
                     )
                
         if dtype == "continuous":
+            group=group.astype(float)
             if normalization_method == "linear":
-                return_series.append(_mpl_normalize(group, matplotlib.colors.Normalize, vmin=-2.5, vmax=2.5)[0])
+                return_series.append(_mpl_normalize(group, matplotlib.colors.Normalize,
+                                                    vmin=group.quantile(0.25),
+                                                    vmax=group.quantile(0.75))[0])
                 return_keys.append(None)
 
             elif normalization_method == "centered":
@@ -117,7 +127,21 @@ def make_color_annotations(ds, datatype, normalization_method = "linear"):
 
             )             
         else:
-            cat_colors = _map_categorical_colors(group, set(group.values), dtype)
+            #This is to control the order that values are assigned to colors
+            #If an order is preferred
+            if color_value_order == None:
+                value_order = list(set(group.values))
+                value_order.sort()
+
+            elif column in color_value_order:
+                if type(color_value_order[column]) == list and  len(color_value_order[column]) == len(set(group.values)):
+                    value_order = color_value_order[column]
+                else:
+                    raise AssertionError(
+                            "color_value_order must be a dict with column names as keys and list of values to map as values"
+                            )
+                    
+            cat_colors = _map_categorical_colors(group, value_order, dtype)
             return_series.append(cat_colors[0])
             return_keys.append(cat_colors[1])
     

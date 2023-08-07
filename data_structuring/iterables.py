@@ -17,9 +17,9 @@ def find_duplicates(x):
     repeated = set()
     
     for element in x:
-        if x in a:
-           repeated.add(x)
+        if element in a:
+           repeated.add(element)
         else:
-           a.add(x)
+           a.add(element)
 
     return (list(repeated))
