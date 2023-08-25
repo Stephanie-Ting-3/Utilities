@@ -6,7 +6,7 @@ Stephanie.Ting.3@gmail.com
 7/24/2023
 
 Last edited:
-8/4/2023
+8/9/2023
 '''
 
 import matplotlib.pyplot as plt
@@ -130,7 +130,7 @@ def make_color_annotations(ds, datatype, normalization_method = "linear", color_
             #This is to control the order that values are assigned to colors
             #If an order is preferred
             if color_value_order == None:
-                value_order = list(set(group.values))
+                value_order = [str(i) for i in set(group.values)]
                 value_order.sort()
 
             elif column in color_value_order:
@@ -141,11 +141,12 @@ def make_color_annotations(ds, datatype, normalization_method = "linear", color_
                             "color_value_order must be a dict with column names as keys and list of values to map as values"
                             )
                     
-            cat_colors = _map_categorical_colors(group, value_order, dtype)
+            cat_colors = _map_categorical_colors(group.astype(str), value_order, dtype)
             return_series.append(cat_colors[0])
             return_keys.append(cat_colors[1])
     
-    return((pd.DataFrame(return_series), return_keys))
+    return_df=pd.DataFrame(return_series)
+    return((return_df,dict(zip(return_df.index, return_keys))))
         
         
 
