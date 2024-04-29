@@ -82,7 +82,7 @@ def produce_variant_file(
     """
     
     print("Reading file...")
-    d=pd.read_csv(maf_input_file, sep='\t', header=0, index_col=None, dtype=str)
+    d=pd.read_csv(maf_input_file, sep='\t', header=0, skiprows=1, index_col=None, dtype=str)
     ds=d.loc[:,[gene_identifier, sample_identifier,mutation_classification_identifier, protein_change_identifier]]
 
     if key_file:
