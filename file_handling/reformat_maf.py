@@ -116,7 +116,7 @@ def produce_variant_file(
                 protein_change=gene_ds.loc[i, protein_change_identifier]
                 variant_class=gene_ds.loc[i, mutation_classification_identifier]
                 
-                if output_format=='sparse binary matrix':
+                if output_format=='sparse_binary_matrix':
 
                     if not protein_change is np.nan: 
                         if not gene+'_'+protein_change in final_dict:
