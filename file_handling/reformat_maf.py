@@ -28,6 +28,7 @@ def produce_variant_file(
     change_thres=80,
     genes_with_all_entries=[],
     only_select_from_list=False,
+    skiprows=1,
     output_format='sparse_binary_matrix'):
 
     """
@@ -77,12 +78,14 @@ def produce_variant_file(
         only_select_from_list - boolean - if true will only use genes in genes_with_all_entries list and
             will not include any other genes in the final output file. Runs much faster than otherwise.
 
+        skiprows - int - number of rows between the top of the maf file and the header
+
         output_format (TODO) - string - chooses whether to output a sparse binary matrix or a list of
             samples for each variant. Sparse binary matrix is much less storage efficient
     """
     
     print("Reading file...")
-    d=pd.read_csv(maf_input_file, sep='\t', header=0, skiprows=1, index_col=None, dtype=str)
+    d=pd.read_csv(maf_input_file, sep='\t', header=0, skiprows=skiprows, index_col=None, dtype=str)
     ds=d.loc[:,[gene_identifier, sample_identifier,mutation_classification_identifier, protein_change_identifier]]
 
     if key_file:
