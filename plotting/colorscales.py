@@ -6,7 +6,7 @@ Stephanie.Ting.3@gmail.com
 7/24/2023
 
 Last edited:
-8/9/2023
+5/1/2024
 '''
 
 import matplotlib.pyplot as plt
@@ -20,6 +20,12 @@ import pandas as pd
 black = matplotlib.colors.to_rgba("black")
 gray = matplotlib.colors.to_rgba("gray")
 white = matplotlib.colors.to_rgba("white")
+#PAM50 colors
+BASAL = "#EB212D"
+HER2 = "#F7C1D9" 
+LUMINAL_A = "#2F3492"
+LUMINAL_B = "#26AFDD"
+NORMAL = "#3CB54C"
 
 def _mpl_normalize(s, method, cmap='vlag', **kwargs):
 
@@ -51,18 +57,22 @@ def _map_categorical_colors(s, values, dtype = 'categorical'):
 
     s - pandas Series to be mapped
     values - values in pandas Series
-    dtype - 'categorical' or 'binary' - determines what color 
+    dtype - 'categorical', 'pam50', or 'binary' - determines what color 
                             color palette will be used
 
     Returns pandas Series object
     '''
     
     if dtype == 'categorical':
-        colorscheme = sns.color_palette("bright")+sns.color_palette("pastel")
+        colorscheme = [i+(1,) for i in sns.color_palette("bright")+sns.color_palette("pastel")+sns.color_palette("dark")]
     elif dtype == 'binary':
         colorscheme = [black, gray, white]
+    elif dtype == 'pam50':
+        colorscheme = [BASAL, HER2, LUMINAL_A, LUMINAL_B, NORMAL]
 
-    color_dict=dict(zip(values, colorscheme))
+    sorted_values = list(values)
+    sorted_values.sort()
+    color_dict=dict(zip(sorted_values, colorscheme))
     
 
     #Return color key as well for referencing
@@ -77,7 +87,7 @@ def make_color_annotations(ds, datatype, normalization_method = "linear", color_
     ds - pandas DataFrame object with each category of features to be mapped as
         columns and the features as rows
 
-    datatype - iterable containing "continuous", "categorical", and/or "binary"
+    datatype - iterable containing "continuous", "categorical", "pam50", and/or "binary"
     color_value_order - dict of lists of values for order in which values should be assigned to colors. 
                         if None, values will be sorted ascending numerically or alphabetically
                         
@@ -103,9 +113,9 @@ def make_color_annotations(ds, datatype, normalization_method = "linear", color_
     for column, dtype in zip(ds.columns, datatype):
         group=ds.loc[:, column]
 
-        if not dtype in ["continuous", "categorical", "binary"]:
+        if not dtype in ["continuous", "categorical", "pam50", "binary"]:
             raise AssertionError(
-                    "datatype must be \"continuous\", \"categorical\", or \"binary\""
+                    "datatype must be \"continuous\", \"categorical\", \"pam50\", or \"binary\""
                     )
                
         if dtype == "continuous":
