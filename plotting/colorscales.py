@@ -78,7 +78,7 @@ def _map_categorical_colors(s, values, dtype = 'categorical'):
     #Return color key as well for referencing
     return((s.map(color_dict), color_dict))
 
-def make_color_annotations(ds, datatype, normalization_method = "linear", color_value_order = None):
+def make_color_annotations(ds, datatype, normalization_method = "linear", normalization_center = 0, color_value_order = None):
 
     '''
     Makes a color annotation pandas Series or DataFrame mapping value to rgba value 
@@ -95,6 +95,9 @@ def make_color_annotations(ds, datatype, normalization_method = "linear", color_
                         followed by "pastel"
                         
                         for binary colors the colors are in order of black, gray, white 
+    normalization_center - numeric value or "median" for continuous data type to center normalization on
+                           if normalization method = "centered"
+                           TODO: allow to take functions
     '''
     
     if not len(datatype) == ds.shape[1]:
@@ -127,8 +130,11 @@ def make_color_annotations(ds, datatype, normalization_method = "linear", color_
                 return_keys.append(None)
 
             elif normalization_method == "centered":
+                if normalization_center == "median":
+                    normalization_center = np.median(group.values)
+
                 return_series.append(_mpl_normalize(group, matplotlib.colors.CenteredNorm,
-                                                    vcenter = np.median(group.values)
+                                                    vcenter = normalization_center
                                                     )[0])
                 return_keys.append(None)
             else:
