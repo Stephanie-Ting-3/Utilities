@@ -127,7 +127,7 @@ def make_color_annotations(ds, datatype, normalization_method = "linear", normal
                 return_series.append(_mpl_normalize(group, matplotlib.colors.Normalize,
                                                     vmin=group.quantile(0.25),
                                                     vmax=group.quantile(0.75))[0])
-                return_keys.append(None)
+                return_keys.append({"0.25":group.quantile(0.25), "0.75": group.quantile(0.75)})
 
             elif normalization_method == "centered":
                 if normalization_center == "median":
