@@ -18,7 +18,7 @@ import numpy as np
 import pandas as pd
 
 black = matplotlib.colors.to_rgba("black")
-gray = matplotlib.colors.to_rgba("gray")
+gray = "#DDDDDD"
 white = matplotlib.colors.to_rgba("white")
 #PAM50 colors
 BASAL = "#EB212D"
@@ -66,7 +66,10 @@ def _map_categorical_colors(s, values, dtype = 'categorical'):
     if dtype == 'categorical':
         colorscheme = [i+(1,) for i in sns.color_palette("bright")+sns.color_palette("pastel")+sns.color_palette("dark")]
     elif dtype == 'binary':
-        colorscheme = [black, gray, white]
+        if len(values) == 3:
+            colorscheme = [white, gray, black]
+        elif len(values == 2):
+            colorscheme = [gray, black]
     elif dtype == 'pam50':
         colorscheme = [BASAL, HER2, LUMINAL_A, LUMINAL_B, NORMAL]
 
