@@ -68,8 +68,12 @@ def _map_categorical_colors(s, values, dtype = 'categorical'):
     elif dtype == 'binary':
         if len(values) == 3:
             colorscheme = [white, gray, black]
-        elif len(values == 2):
+        elif len(values) == 2:
             colorscheme = [gray, black]
+        else:
+            raise AssertionError(
+                    "binary data type must have 2 values"
+                    )
     elif dtype == 'pam50':
         colorscheme = [BASAL, HER2, LUMINAL_A, LUMINAL_B, NORMAL]
 
