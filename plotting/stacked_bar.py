@@ -15,7 +15,7 @@ def stacked_bar(df, x, y, stacks = None, color_dict = None, x_order = None):
 
     '''
     if stacks == None:
-        bp_df = df.loc[:, [x, y]]
+        bp_df = df.loc[:, [x, y]] 
     else:
         bp_df = df.loc[:, [x, y, stacks]]
         bp_df[stacks] = round(bp_df[stacks]*100)
@@ -24,22 +24,23 @@ def stacked_bar(df, x, y, stacks = None, color_dict = None, x_order = None):
     for an, color in color_dict:
         print(an)
         if stacks == None:
-            total_bp_df = bp_df[x].value_counts().reset_index().sort_values("index")
+            total_bp_df = bp_df[x].value_counts().reset_index().sort_values("count")
         else:
             total_bp_df = bp_df.loc[:, [x, stacks]]
-            total_bp_df.columns = ["index", x]
+            total_bp_df.columns = [x, "count"]
 
-        xs = set(total_bp_df["index"].values)
+        xs = set(total_bp_df[x].values)
         xs_diff = all_xs.difference(xs)
         if len(xs_diff) !=0:
-            add_df = pd.DataFrame(index = range(len(xs_diff)), data = np.transpose([list(xs_diff), [0]*len(xs_diff)]), columns = ["index", x])
-            total_bp_df = pd.concat([total_bp_df, add_df]).sort_values("index")
-            total_bp_df[x] = total_bp_df[x].astype(int)
-                          
-        if stacks != None:
-            total_bp_df = total_bp_df.groupby("index").sum().reset_index()
+            add_df = pd.DataFrame(index = range(len(xs_diff)), data = np.transpose([list(xs_diff), [0]*len(xs_diff)]), columns = [x, "count"]) 
+            total_bp_df = pd.concat([total_bp_df, add_df])
+            total_bp_df["count"] = total_bp_df["count"].astype(int)
+            total_bp_df.sort_values("count")
 
-        sns.barplot(y = x, x = "index", data = total_bp_df, color = color, order = x_order)
+        if stacks != None:
+            total_bp_df = total_bp_df.groupby("count").sum().reset_index()
+
+        sns.barplot(y = "count", x = x, data = total_bp_df, color = color, order = x_order, orient = "v", errorbar = None)
 
         bp_df = bp_df.loc[bp_df[y]!=an]
-    plt.show()
+    plt.show() 
