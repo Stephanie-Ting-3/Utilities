@@ -155,22 +155,18 @@ def make_color_annotations(ds, datatype, normalization_method = "linear", normal
         else:
             #This is to control the order that values are assigned to colors
             #If an order is preferred
-            if color_value_order == None:
-                value_order = [str(i) for i in set(group.values)]
-                value_order.sort()
-
-            elif column in color_value_order:
+             if column in color_value_order:
                 if type(color_value_order[column]) == list and  len(color_value_order[column]) == len(set(group.values)):
                     value_order = color_value_order[column]
                 else:
                     raise AssertionError(
                             "color_value_order must be a dict with column names as keys and list of values to map as values"
                             )
-                    
             else:
-                raise AssertionError(
-                        "color_value_order must be a dict with column names as keys and a list of values to map as values"
-                        )
+                value_order = [str(i) for i in set(group.values)]
+                value_order.sort()
+
+                   
             cat_colors = _map_categorical_colors(group.astype(str), value_order, dtype, custom_colors)
             return_series.append(cat_colors[0])
             return_keys.append(cat_colors[1])
