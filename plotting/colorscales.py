@@ -155,7 +155,7 @@ def make_color_annotations(ds, datatype, normalization_method = "linear", normal
         else:
             #This is to control the order that values are assigned to colors
             #If an order is preferred
-             if column in color_value_order:
+            if not color_value_order==None and column in color_value_order:
                 if type(color_value_order[column]) == list and  len(color_value_order[column]) == len(set(group.values)):
                     value_order = color_value_order[column]
                 else:
