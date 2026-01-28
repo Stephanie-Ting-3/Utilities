@@ -6,7 +6,7 @@ Stephanie.Ting.3@gmail.com
 7/24/2023
 
 Last edited:
-5/1/2024
+7/31/2025
 '''
 
 import matplotlib.pyplot as plt
@@ -50,7 +50,7 @@ def _mpl_normalize(s, method, cmap='vlag', **kwargs):
 
     return((s.map(lambda x: mapper.to_rgba(x)),))
 
-def _map_categorical_colors(s, values, dtype = 'categorical'):
+def _map_categorical_colors(s, values, dtype = 'categorical', custom_colors = None):
     '''
     Internal function that maps a categorical or binary variable to 
     sns color palettes.
@@ -63,29 +63,31 @@ def _map_categorical_colors(s, values, dtype = 'categorical'):
     Returns pandas Series object
     '''
     
-    if dtype == 'categorical':
-        colorscheme = [i+(1,) for i in sns.color_palette("bright")+sns.color_palette("pastel")+sns.color_palette("dark")]
-    elif dtype == 'binary':
-        if len(values) == 3:
-            colorscheme = [white, gray, black]
-        elif len(values) == 2:
-            colorscheme = [gray, black]
-        else:
-            raise AssertionError(
-                    "binary data type must have 2 values"
-                    )
-    elif dtype == 'pam50':
-        colorscheme = [BASAL, HER2, LUMINAL_A, LUMINAL_B, NORMAL]
+    if custom_colors == None:
+        if dtype == 'categorical':
+            colorscheme = [i+(1,) for i in sns.color_palette("bright")+sns.color_palette("pastel")+sns.color_palette("dark")]
+                
+        elif dtype == 'binary':
+            if len(values) == 3:
+                colorscheme = [white, gray, black]
+            elif len(values) <= 2:
+                colorscheme = [gray, black]
+            else:
+                raise AssertionError(
+                        "binary data type must have 2 values"
+                        )
+        elif dtype == 'pam50':
+            colorscheme = [BASAL, HER2, LUMINAL_A, LUMINAL_B, NORMAL]
 
-    sorted_values = list(values)
-    sorted_values.sort()
-    color_dict=dict(zip(sorted_values, colorscheme))
-    
+        sorted_values = list(values)
+        color_dict=dict(zip(sorted_values, colorscheme))
+    else:
+        color_dict = custom_colors
 
     #Return color key as well for referencing
     return((s.map(color_dict), color_dict))
 
-def make_color_annotations(ds, datatype, normalization_method = "linear", normalization_center = 0, color_value_order = None):
+def make_color_annotations(ds, datatype, normalization_method = "linear", normalization_center = 0, color_value_order = None, custom_colors = None):
 
     '''
     Makes a color annotation pandas Series or DataFrame mapping value to rgba value 
@@ -105,6 +107,7 @@ def make_color_annotations(ds, datatype, normalization_method = "linear", normal
     normalization_center - numeric value or "median" for continuous data type to center normalization on
                            if normalization method = "centered"
                            TODO: allow to take functions
+    custom_colors - python dict containing value:colors for custom colors. If None, default colors
     '''
     
     if not len(datatype) == ds.shape[1]:
@@ -164,7 +167,11 @@ def make_color_annotations(ds, datatype, normalization_method = "linear", normal
                             "color_value_order must be a dict with column names as keys and list of values to map as values"
                             )
                     
-            cat_colors = _map_categorical_colors(group.astype(str), value_order, dtype)
+            else:
+                raise AssertionError(
+                        "color_value_order must be a dict with column names as keys and a list of values to map as values"
+                        )
+            cat_colors = _map_categorical_colors(group.astype(str), value_order, dtype, custom_colors)
             return_series.append(cat_colors[0])
             return_keys.append(cat_colors[1])
     
